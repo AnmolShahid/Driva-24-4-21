@@ -115,7 +115,7 @@ void showSnackBar(String title){
     
     Scaffold(
       resizeToAvoidBottomInset: true,
-      resizeToAvoidBottomPadding: false,
+     // resizeToAvoidBottomPadding: false,
       key: _scaffoldKey,
       
       drawer: CusDrawerPage(context),

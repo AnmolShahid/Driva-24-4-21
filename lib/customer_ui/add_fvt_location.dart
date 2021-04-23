@@ -110,7 +110,7 @@ textController.text = 'Current Location';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+    //  resizeToAvoidBottomPadding: false,
       body: Stack(
         children: <Widget>[
           // Map widget

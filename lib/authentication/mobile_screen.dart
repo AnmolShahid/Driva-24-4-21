@@ -19,7 +19,7 @@ class _MobileNoFieldClassState extends State<MobileNoFieldClass> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whtColor,
-      resizeToAvoidBottomPadding: false,
+    //  resizeToAvoidBottomPadding: false,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(appBarHeight), // here the desired height
           child: CusAppBarClass( context,'Sign Up', false, _scaffoldKey) ),

@@ -84,7 +84,7 @@ Position position;
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      resizeToAvoidBottomPadding: false,
+      //resizeToAvoidBottom: false,
       key: _scaffoldKey,
       drawer: DriverDrawerPage(context),
       appBar:    AppBar(

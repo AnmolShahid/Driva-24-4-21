@@ -7,7 +7,7 @@ import 'package:flutter_app/push_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:country_code_picker/country_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+//import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,8 +39,8 @@ class MyApp extends StatelessWidget {
       ],
       localizationsDelegates: [
         CountryLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
+       // GlobalMaterialLocalizations.delegate,
+       // GlobalWidgetsLocalizations.delegate,
       ],
        debugShowCheckedModeBanner: false,
     initialRoute: 'SplashScreen',
