@@ -56,7 +56,6 @@ dependencies:
   fl_chart: ^0.12.2
   firebase_storage: 
   image_picker: 
-  double_back_to_close_app: 
   firebase_messaging:
   flutter_local_notifications:
   flutter_geofire: ^1.0.3
