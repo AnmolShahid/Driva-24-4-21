@@ -48,6 +48,8 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   DirectionDetails tripDirectionDetails;
 // firebase
 
+  DatabaseReference msgReference =
+      FirebaseDatabase.instance.reference().child('message').push();
   DatabaseReference rideReference;
   DatabaseReference tripReference;
   bool istripRef = false;
@@ -76,6 +78,17 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   LatLng oldPosition;
 
   var driver_feed;
+
+  void showSnackBar(String title) {
+    final snackBar = SnackBar(
+      content: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 15),
+      ),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +498,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
                             ),
                           ],
                         )),
-                        rideStatus == 1 || rideStatus == 5
+                        rideStatus == 1
                             ? tripDirectionDetails == null
                                 ? Container(
                                     margin: EdgeInsets.only(
@@ -497,11 +510,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
                                         ? Colors.red
                                         : Colors.black,
                                     child: Text(
-                                        rideStatus == 5
-                                            ? ''
-                                            : rideStatus == 3
-                                                ? '\nWaiting'
-                                                : '',
+                                        rideStatus == 3 ? '\nWaiting' : '',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             color: whtColor,
@@ -514,9 +523,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
                                     ),
                                     padding: EdgeInsets.only(
                                         left: 20, right: 20, top: 5, bottom: 5),
-                                    color: rideStatus == 5
-                                        ? Colors.red
-                                        : Colors.black,
+                                    color: Colors.black,
                                     child: Text(
                                         tripDirectionDetails.durationText +
                                             '\n' +
@@ -770,13 +777,28 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     // TODO: implement initState
     super.initState();
     // getUserLocation();
-
+    listnerMessage();
     getCurrentDriverInfo();
     geoOnline(true);
     HelperMethods.getCurrentUSerInfo();
     startTime();
     getUserData();
     checkRequest();
+  }
+
+  void listnerMessage() {
+    msgReference.onValue.listen((event) {
+      print('Triggered Listener on -- ADDED -- friend info');
+      print(
+          'info that changed: ${event.snapshot.key}: ${event.snapshot.value}');
+      if (event.snapshot.key == 'sent_to') {
+        var sent_to = event.snapshot.value;
+        msg = true;
+        if (constant_uid == sent_to) {
+          showSnackBar('New Message');
+        }
+      }
+    });
   }
 
   startTime() async {
@@ -1250,6 +1272,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
 
   void checkRequest() {
     try {
+      listnerMessage();
       rideReference.onValue.listen((event) {
         print('Triggered Listener on -- CHANGED -- friend info');
         print(

@@ -76,6 +76,8 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
   int rideStatus = 0;
   DatabaseReference rideReference;
 
+  DatabaseReference msgReference =
+      FirebaseDatabase.instance.reference().child('message').push();
 // direction
   var cost;
   String driver_token;
@@ -1012,8 +1014,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
                       SizedBox(
                         width: 10,
                       ),
+                      msg == true ? Text('*') : Text(''),
                       Text(
-                        'Massage',
+                        'Message',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       )
@@ -1086,9 +1089,25 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
     _lastMapPosition = currentlocation;
     HelperMethods.getCurrentUSerInfo();
     startTime();
+    listnerMessage();
     getLocations();
     setState(() {});
     //checkRideRequestStatus();
+  }
+
+  void listnerMessage() {
+    msgReference.onChildAdded.listen((event) {
+      print('Triggered Listener on -- ADDED -- friend info');
+      print(
+          'info that changed: ${event.snapshot.key}: ${event.snapshot.value}');
+      if (event.snapshot.key == 'sent_to') {
+        var sent_to = event.snapshot.value;
+        msg = true;
+        if (constant_uid == sent_to) {
+          showSnackBar('New Message');
+        }
+      }
+    });
   }
 
   startTime() async {
@@ -2244,7 +2263,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         }
         if (event.snapshot.value == 3) {
           // driver start ride
-          await getDirection();
+          //
+
+          await getDirectionResume();
           Flushbar(
             flushbarPosition: FlushbarPosition.TOP,
             title: "Ride Started",
