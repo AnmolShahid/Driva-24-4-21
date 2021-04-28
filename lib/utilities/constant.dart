@@ -54,6 +54,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 String image;
 String date, time;
+var timestamp;
 String custom_rider, custom_rider_id, custom_trip_id;
 String constant_phone;
 String constant_name;
@@ -68,6 +69,11 @@ Fare fareSetting;
 int locationSet = 0;
 int setLocation = 0;
 var apiKey = 'AIzaSyAUqoje9DfiCojdYrICiT0643jh7N6stLc';
+
+    var estimated_time ;
+      var total;
+      var additional;
+
 
 StreamSubscription<Position> homeTabPositionStream;
 

@@ -45,7 +45,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   // declared only for ui showing nxt screen
   bool reached = false;
   DatabaseReference tripRequestRef;
-  DirectionDetails tripDirectionDetails;
+  //DirectionDetails tripDirectionDetails;
 // firebase
 
   DatabaseReference msgReference =
@@ -56,6 +56,8 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   Position myPosition;
 // map veriables and controller
   GoogleMapController _controller;
+  final CameraPosition _initialPosition =
+      CameraPosition(target: LatLng(24.903623, 67.198367));
   static var latt = 31.476101;
   // static var latt =32.1009479;
   static var longg = 74.280672;
@@ -777,12 +779,14 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     // TODO: implement initState
     super.initState();
     // getUserLocation();
-    listnerMessage();
+    //  listnerMessage();
     getCurrentDriverInfo();
+    setState(() {});
     geoOnline(true);
     HelperMethods.getCurrentUSerInfo();
     startTime();
     getUserData();
+    setState(() {});
     checkRequest();
   }
 
@@ -813,7 +817,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     driverReference.once().then((DataSnapshot dataSnapshot) async {
       total_km = dataSnapshot.value["distance"];
 
-      total_earn = dataSnapshot.value["total_EstimatedFare"];
+      total_earn = dataSnapshot.value["total"];
       /*  DatabaseReference  driverR = FirebaseDatabase.instance.reference()
                   .child('rideRequest')
                   .orderByChild('driver_id')
@@ -834,6 +838,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   }
 
   void getUserLocation() async {
+    final GoogleMapController mapController = await _controller;
     setState(() {
       isLoading = false;
     });
@@ -843,58 +848,61 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
 
+    currentLocation = await location.getLocation();
+
+    final lat = currentLocation["latitude"];
+    final lng = currentLocation["longitude"];
+    setState(() {
+      latt = lat;
+      longg = lng;
+      gotLocation = true;
+    });
+    DatabaseReference teRef = FirebaseDatabase.instance
+        .reference()
+        .child('users/${currentUserInfo.id}');
+
+    Map currentPosition = {'lat': lat, 'lng': lng};
+    teRef.child('position').set(currentPosition);
+
+    PushNotificationService p = PushNotificationService();
+    var token = await p.getToken();
+
+    print('Your Latitude is: $latt, Longitude is: $longg');
     try {
-      currentLocation = await location.getLocation();
-
-      final lat = currentLocation["latitude"];
-      final lng = currentLocation["longitude"];
-      setState(() {
-        latt = lat;
-        longg = lng;
-        gotLocation = true;
-      });
-      DatabaseReference teRef =
-          FirebaseDatabase.instance.reference().child('users/${user.uid}');
-
-      Map currentPosition = {'lat': lat, 'lng': lng};
-      teRef.child('position').set(currentPosition);
-
-      PushNotificationService p = PushNotificationService();
-      var token = await p.getToken();
-
-      print('Your Latitude is: $latt, Longitude is: $longg');
       await _controller
           .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(lat, lng),
         zoom: 15,
       )));
-      String address =
-          await HelperMethods.findCordinateAddress(position, context);
-
-      location.onLocationChanged().listen((event) {
-        currentLocation = event;
-        DatabaseReference teRef =
-            FirebaseDatabase.instance.reference().child('users/${user.uid}');
-
-        Map currentPosition = {
-          'lat': currentLocation["latitude"],
-          'lng': currentLocation["longitude"]
-        };
-        if (onlineStatus) {
-          teRef.child('position').set(currentPosition);
-
-          Geofire.setLocation(user.uid, currentLocation["latitude"],
-              currentLocation["longitude"]);
-        }
-      });
-      rideReference = FirebaseDatabase.instance
-          .reference()
-          .child('users/${user.uid}/newReq');
-      await checkRequest();
-    } on Exception {
+    } catch (e) {
+      AppRoutes.replace(context, DriverHomeClass());
       currentLocation = null;
       return null;
     }
+    setState(() {});
+    String address =
+        await HelperMethods.findCordinateAddress(position, context);
+
+    location.onLocationChanged().listen((event) {
+      currentLocation = event;
+      DatabaseReference teRef = FirebaseDatabase.instance
+          .reference()
+          .child('users/${currentUserInfo.id}}');
+
+      Map currentPosition = {
+        'lat': currentLocation["latitude"],
+        'lng': currentLocation["longitude"]
+      };
+      if (onlineStatus) {
+        teRef.child('position').set(currentPosition);
+
+        Geofire.setLocation(user.uid, currentLocation["latitude"],
+            currentLocation["longitude"]);
+      }
+    });
+    rideReference =
+        FirebaseDatabase.instance.reference().child('users/${user.uid}/newReq');
+    await checkRequest();
   }
 
   Future<void> geoOnline(status) async {
@@ -927,8 +935,9 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     //   p.setUpFirebase();
     //   p.getToken();
     User user = FirebaseAuth.instance.currentUser;
-    DatabaseReference driverRef =
-        FirebaseDatabase.instance.reference().child("users/${user.uid}");
+    DatabaseReference driverRef = FirebaseDatabase.instance
+        .reference()
+        .child("users/${currentUserInfo.id}");
     driverRef.once().then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
         currentDriverInfo = Drivers.fromSnapshot(snapshot);
@@ -1224,18 +1233,11 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   void collectCash() async {
     DatabaseReference feedbackReference =
         FirebaseDatabase.instance.reference().child('rideRequest/$trip_id');
-    feedbackReference
-        .child("total_EstimatedFare")
-        .set(estimatedFare[0].total_EstimatedFare);
-    feedbackReference
-        .child("base_EstimatedFare")
-        .set(estimatedFare[0].base_EstimatedFare);
-    feedbackReference
-        .child("distance_EstimatedFare")
-        .set(estimatedFare[0].distance_EstimatedFare);
-    feedbackReference
-        .child("time_EstimatedFare")
-        .set(estimatedFare[0].time_EstimatedFare);
+    feedbackReference.child("additional").set(additional);
+    feedbackReference.child("discount").set('');
+    feedbackReference.child("time").set(tripDirectionDetails.durationText);
+    feedbackReference.child("total").set(total);
+
     feedbackReference.child("distance").set(tripDirectionDetails.distanceText);
     feedbackReference.child("ride_end").set(DateTime.now().toString());
     feedbackReference.child('complaintByDriver').set(0);
@@ -1244,9 +1246,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
         .reference()
         .child('users/${currentUserInfo.id}');
 
-    updateRefo
-        .child("total_EstimatedFare")
-        .set(estimatedFare[0].total_EstimatedFare);
+    updateRefo.child("total_EstimatedFare").set(total);
     updateRefo.child("distance").set(tripDirectionDetails.distanceText);
 
     DatabaseReference teRef = FirebaseDatabase.instance

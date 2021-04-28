@@ -229,6 +229,8 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
           otherpickupPlace.longitude = event.value["lng"];
         });
       });
+
+      setState(() {});
     } catch (e) {}
   }
 
@@ -673,10 +675,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
           Text(
             (tripDirectionDetails != null)
-                ? 'Estimated QAR ' +
-                    ((tripDirectionDetails.distanceValue) / 1005)
-                        .truncate()
-                        .toString()
+                ? 'Estimated QAR ' + (total).truncate().toString()
                 : 'Estimated QAR ' + (1).toString(),
             style: TextStyle(
                 fontSize: 20,
@@ -1088,8 +1087,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
     currentlocation = LatLng(latt, longg);
     _lastMapPosition = currentlocation;
     HelperMethods.getCurrentUSerInfo();
+    setState(() {});
     startTime();
-    listnerMessage();
+    // listnerMessage();
     getLocations();
     setState(() {});
     //checkRideRequestStatus();
@@ -1711,8 +1711,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
       });
       User user = FirebaseAuth.instance.currentUser;
 
-      DatabaseReference teRef =
-          FirebaseDatabase.instance.reference().child('users/${user.uid}');
+      DatabaseReference teRef = FirebaseDatabase.instance
+          .reference()
+          .child('users/${currentUserInfo.id}}');
 
       Map currentPosition = {'lat': lat, 'lng': lng};
       teRef.child('position').set(currentPosition);
@@ -1740,8 +1741,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
       await startGeofireListener();
       location.onLocationChanged().listen((event) {
         currentLocation = event;
-        DatabaseReference teRef =
-            FirebaseDatabase.instance.reference().child('users/${user.uid}');
+        DatabaseReference teRef = FirebaseDatabase.instance
+            .reference()
+            .child('users/${currentUserInfo.id}}');
 
         Map currentPosition = {
           'lat': currentLocation["latitude"],
@@ -2035,6 +2037,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         .reference()
         .child('rideRequest/${trip_id}/status');
     updateRef.once().then((DataSnapshot event) async {
+      print(event.value);
       if (event.value == 1) {
         DatabaseReference updateRef = FirebaseDatabase.instance
             .reference()
@@ -2128,18 +2131,10 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         );
         DatabaseReference feedbackReference =
             FirebaseDatabase.instance.reference().child('rideRequest/$trip_id');
-        feedbackReference
-            .child("total_EstimatedFare")
-            .set(estimatedFare[0].total_EstimatedFare);
-        feedbackReference
-            .child("base_EstimatedFare")
-            .set(estimatedFare[0].base_EstimatedFare);
-        feedbackReference
-            .child("distance_EstimatedFare")
-            .set(estimatedFare[0].distance_EstimatedFare);
-        feedbackReference
-            .child("time_EstimatedFare")
-            .set(estimatedFare[0].time_EstimatedFare);
+        feedbackReference.child("additional").set(additional);
+        feedbackReference.child("discount").set('');
+        feedbackReference.child("total").set(total);
+        feedbackReference.child("time").set(tripDirectionDetails.durationText);
         feedbackReference
             .child("distance")
             .set(tripDirectionDetails.distanceText);
@@ -2151,9 +2146,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
             .reference()
             .child('users/${currentUserInfo.id}');
 
-        updateRefo
-            .child("total_EstimatedFare")
-            .set(estimatedFare[0].total_EstimatedFare);
+        updateRefo.child("total_EstimatedFare").set(total);
         updateRefo.child("distance").set(tripDirectionDetails.distanceText);
         updateRefo.child("ride_end").set(DateTime.now().toString());
 
@@ -2297,25 +2290,19 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
           //cash
           //
 
-          Map data = {
-            'total_EstimatedFare': estimatedFare[0].total_EstimatedFare,
-            'base_EstimatedFare': estimatedFare[0].base_EstimatedFare,
-            'distance_EstimatedFare': estimatedFare[0].distance_EstimatedFare,
-            'time_EstimatedFare': estimatedFare[0].time_EstimatedFare,
-            'distance': tripDirectionDetails.distanceText,
-          };
-          Flushbar(
-            flushbarPosition: FlushbarPosition.TOP,
-            title:
-                "Please pay estimated cash ${estimatedFare[0].total_EstimatedFare}",
-            duration: Duration(seconds: 3),
-          );
           DatabaseReference feedbackReference = FirebaseDatabase.instance
               .reference()
               .child('rideRequest/$trip_id');
+          feedbackReference.child("additional").set(additional);
+          feedbackReference.child("discount").set('');
+          feedbackReference.child("total").set(total);
           feedbackReference
+              .child("time")
+              .set(tripDirectionDetails.durationText);
+
+          /*      feedbackReference
               .child("total_EstimatedFare")
-              .set(estimatedFare[0].total_EstimatedFare);
+              .set(total);
           feedbackReference
               .child("base_EstimatedFare")
               .set(estimatedFare[0].base_EstimatedFare);
@@ -2324,7 +2311,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
               .set(estimatedFare[0].distance_EstimatedFare);
           feedbackReference
               .child("time_EstimatedFare")
-              .set(estimatedFare[0].time_EstimatedFare);
+              .set(estimatedFare[0].time_EstimatedFare); */
           feedbackReference
               .child("distance")
               .set(tripDirectionDetails.distanceText);
@@ -2335,18 +2322,16 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
               .reference()
               .child('users/${currentUserInfo.id}');
 
-          updateRefo
-              .child("total_EstimatedFare")
-              .set(estimatedFare[0].total_EstimatedFare);
+          updateRefo.child("total_EstimatedFare").set(total);
           updateRefo.child("distance").set(tripDirectionDetails.distanceText);
-
-          AppRoutes.push(
-              context, CustomerBillCalculationClass(trip_id, driver_id));
 
           DatabaseReference teRef = FirebaseDatabase.instance
               .reference()
               .child('rideRequest/${trip_id}/status');
           teRef.set(10);
+
+          AppRoutes.push(
+              context, CustomerBillCalculationClass(trip_id, driver_id));
         }
 
         if (event.snapshot.value == 2) {
