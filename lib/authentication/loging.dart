@@ -1,4 +1,4 @@
-import 'package:connectivity/connectivity.dart';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -483,13 +483,6 @@ void showSnackBar(String title){
       ),
     );
   }
-void checkConnectivity()async{
-
-  var connectivityResult = await (Connectivity().checkConnectivity());
-if (connectivityResult != ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) {
-    showSnackBar('Internet is not Connected.');
-}
-}
 void loginViaPhone(String number){
 
 

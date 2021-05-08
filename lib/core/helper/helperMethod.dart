@@ -1,8 +1,4 @@
 import 'dart:math';
-
-import 'dart:math';
-
-import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_app/core/dbmodels/fare.dart';
@@ -39,11 +35,7 @@ class HelperMethods extends GetxController {
   static Future<String> findCordinateAddress(Position position, context) async {
     String placeAddress = '';
 
-    var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult != ConnectivityResult.mobile &&
-        connectivityResult != ConnectivityResult.wifi) {
-      return placeAddress;
-    }
+
 
     String url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=AIzaSyAUqoje9DfiCojdYrICiT0643jh7N6stLc';

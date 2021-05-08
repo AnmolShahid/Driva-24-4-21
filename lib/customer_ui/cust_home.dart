@@ -5,13 +5,13 @@ import 'dart:async'; // Import package
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_app/push_notification_service.dart';
-import 'package:ringtone/ringtone.dart';
+
 import 'add_fvt_location.dart';
 import 'package:flutter_app/utilities/constant.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'search_pickup.dart';
 import 'package:flutter_app/core/model/address.dart';
-import 'fvt_locations.dart';
+
 import 'package:flutter_app/customer_ui/customer_bill.dart';
 import 'package:flutter_app/core/dbmodels/trip.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -159,13 +159,14 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
       ),
       onWillPop: () {
         if (rideStatus != 0) {
-          setState(() {
-            rideStatus = 0;
-            markers.clear();
-            _polylines.clear();
-            _Markers.clear();
-            polylineCoordinates.clear();
-          });
+          if (mounted)
+            setState(() {
+              rideStatus = 0;
+              markers.clear();
+              _polylines.clear();
+              _Markers.clear();
+              polylineCoordinates.clear();
+            });
         }
       },
     );
@@ -197,25 +198,27 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
           .reference()
           .child('users/${currentUserInfo.id}/place/0');
       updateRef.once().then((DataSnapshot event) async {
-        setState(() {
-          home = event.value["placeName"];
-          pickupPlace.placeId = event.value["placeID"];
-          pickupPlace.placeName = event.value["placeName"];
-          pickupPlace.latitude = event.value["lat"];
-          pickupPlace.longitude = event.value["lng"];
-        });
+        if (mounted)
+          setState(() {
+            home = event.value["placeName"];
+            pickupPlace.placeId = event.value["placeID"];
+            pickupPlace.placeName = event.value["placeName"];
+            pickupPlace.latitude = event.value["lat"];
+            pickupPlace.longitude = event.value["lng"];
+          });
       });
       DatabaseReference updateRef1 = FirebaseDatabase.instance
           .reference()
           .child('users/${currentUserInfo.id}/place/1');
       updateRef1.once().then((DataSnapshot event) async {
-        setState(() {
-          work = event.value["placeName"];
-          workpickupPlace.placeId = event.value["placeID"];
-          workpickupPlace.placeName = event.value["placeName"];
-          workpickupPlace.latitude = event.value["lat"];
-          workpickupPlace.longitude = event.value["lng"];
-        });
+        if (mounted)
+          setState(() {
+            work = event.value["placeName"];
+            workpickupPlace.placeId = event.value["placeID"];
+            workpickupPlace.placeName = event.value["placeName"];
+            workpickupPlace.latitude = event.value["lat"];
+            workpickupPlace.longitude = event.value["lng"];
+          });
       });
       DatabaseReference updateRef2 = FirebaseDatabase.instance
           .reference()
@@ -1086,12 +1089,12 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
     currentlocation = LatLng(latt, longg);
     _lastMapPosition = currentlocation;
-    HelperMethods.getCurrentUSerInfo();
-    setState(() {});
+    // HelperMethods.getCurrentUSerInfo();
+
     startTime();
     // listnerMessage();
     getLocations();
-    setState(() {});
+
     //checkRideRequestStatus();
   }
 
@@ -1122,13 +1125,14 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
   void _onMapCreated(GoogleMapController controller) {
     _controller = controller;
-    setState(() {
-      if (rideStatus == 0) {
-        mapBottomPadding = (Platform.isAndroid) ? 260 : 250;
-      } else {
-        mapBottomPadding = 0.0;
-      }
-    });
+    if (mounted)
+      setState(() {
+        if (rideStatus == 0) {
+          mapBottomPadding = (Platform.isAndroid) ? 260 : 250;
+        } else {
+          mapBottomPadding = 0.0;
+        }
+      });
   }
 
   driverLocation(int varible) {
@@ -1691,9 +1695,12 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
   }
 
   void getUserLocation() async {
-    setState(() {
-      isLoading = false;
-    });
+    await HelperMethods.getCurrentUSerInfo();
+    print(currentUserInfo.id);
+    if (mounted)
+      setState(() {
+        isLoading = false;
+      });
     currentLocation = <String, double>{};
 
     try {
@@ -1709,7 +1716,6 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         longg = lng;
         gotLocation = true;
       });
-      User user = FirebaseAuth.instance.currentUser;
 
       DatabaseReference teRef = FirebaseDatabase.instance
           .reference()
@@ -1749,6 +1755,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
           'lat': currentLocation["latitude"],
           'lng': currentLocation["longitude"]
         };
+
         teRef.child('position').set(currentPosition);
       });
     } on Exception {
@@ -1874,12 +1881,14 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
   void requestTime() {
     rideReference.onValue.listen((event) async {
-      if (event.snapshot.value["request_to_status"] == 0) {
-        cancelRideRequest();
-        if (rideStatus == 0) {
-          await getDirection();
+      try {
+        if (event.snapshot.value["request_to_status"] == 0) {
+          cancelRideRequest();
+          if (rideStatus == 0) {
+            await getDirection();
+          }
         }
-      }
+      } catch (e) {}
     });
   }
 
@@ -2167,6 +2176,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         //    showSnackBar('Request Cancelled');
         // return;
       }
+      /*
       if (event.value == 1) {
         DatabaseReference updat =
             FirebaseDatabase.instance.reference().child('users/${driver_id}');
@@ -2179,7 +2189,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
         setState(() {
           rideStatus = 2;
         });
-      }
+      }*/
       if (event.value == 10) {
         setState(() {
           rideStatus = 0;
@@ -2417,9 +2427,10 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
   }
 
   void updateDriveronMap() {
-    setState(() {
-      _Markers.clear();
-    });
+    if (mounted)
+      setState(() {
+        _Markers.clear();
+      });
 
     Set<Marker> tempMarker = Set<Marker>();
     for (NearbyDrivers driver in FireHepler.nearbyDriverList) {

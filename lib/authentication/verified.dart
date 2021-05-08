@@ -69,8 +69,8 @@ class _VerifiedScreenClassState extends State<VerifiedScreenClass> {
   }
 
 
-  void buttonPress(){
-     HelperMethods.getCurrentUSerInfo();
+  Future<void> buttonPress() async {
+    await HelperMethods.getCurrentUSerInfo();
     if(constant_role==0){
      
         AppRoutes.replace(context, CareRegistrationClass());

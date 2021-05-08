@@ -7,7 +7,6 @@ import 'package:flutter_app/utilities/input_field.dart';
 import 'package:flutter_app/utilities/routes.dart';
 import 'package:flutter_app/utilities/utilities.dart';
 import 'package:image_pickers/image_pickers.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:io';
@@ -41,13 +40,7 @@ void showSnackBar(String title){
   _scaffoldKey.currentState.showSnackBar(snackBar);
 }
 
-void checkConnectivity()async{
 
-  var connectivityResult = await (Connectivity().checkConnectivity());
-if (connectivityResult != ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) {
-    showSnackBar('Internet is not Connected.');
-}
-}
 
 Future<void> selectImages() async {
     List<Media> _listImagePaths = await ImagePickers.pickerPaths(

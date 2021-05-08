@@ -19,7 +19,6 @@ import 'package:flutter_app/utilities/flutter_switch.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_app/utilities/location.dart' as LocationManager;
 import 'bar_drawer.dart';
-import 'package:ringtone/ringtone.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
@@ -1179,7 +1178,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   }
 
   void arrivedPress() {
-    Ringtone.play();
+   
 
     DatabaseReference tripHistory = FirebaseDatabase.instance
         .reference()
@@ -1192,7 +1191,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     //  HelperMethods.disableHomeTabLocationUpdates();
     setState(() {
       rideStatus = 3;
-      Ringtone.stop();
+    
     });
   }
 
