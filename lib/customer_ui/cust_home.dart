@@ -119,6 +119,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
   @override
   Widget build(BuildContext context) {
     createMarker();
+    HelperMethods.getCurrentUSerInfo();
     return WillPopScope(
       child: Scaffold(
         resizeToAvoidBottomInset: true,
@@ -192,8 +193,9 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
           );
   }
 
-  getLocations() {
+  getLocations() async {
     try {
+      await HelperMethods.getCurrentUSerInfo();
       DatabaseReference updateRef = FirebaseDatabase.instance
           .reference()
           .child('users/${currentUserInfo.id}/place/0');
@@ -1086,7 +1088,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
     // TODO: implement initState
     super.initState();
     _Markers.clear();
-
+    HelperMethods.getCurrentUSerInfo();
     currentlocation = LatLng(latt, longg);
     _lastMapPosition = currentlocation;
     // HelperMethods.getCurrentUSerInfo();
@@ -1719,7 +1721,7 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
       DatabaseReference teRef = FirebaseDatabase.instance
           .reference()
-          .child('users/${currentUserInfo.id}}');
+          .child('users/${currentUserInfo.id}');
 
       Map currentPosition = {'lat': lat, 'lng': lng};
       teRef.child('position').set(currentPosition);
@@ -1758,8 +1760,11 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
 
         teRef.child('position').set(currentPosition);
       });
+      setState(() {});
     } on Exception {
       currentLocation = null;
+      String address =
+          await HelperMethods.findCordinateAddress(position, context);
       return null;
     }
   }

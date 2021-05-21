@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -15,15 +14,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_app/utilities/location.dart' as LocationManager;
 import 'package:flutter/services.dart' show rootBundle;
 
-const String apiKEY = "AIzaSyAUqoje9DfiCojdYrICiT0643jh7N6stLc&sessiontoken=1234567890";
-
+const String apiKEY =
+    "AIzaSyAUqoje9DfiCojdYrICiT0643jh7N6stLc&sessiontoken=1234567890";
 
 class MapPage extends StatefulWidget {
   @override
   State<MapPage> createState() => MapSampleState();
 }
 
-class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin {
+class MapSampleState extends State<MapPage>
+    with SingleTickerProviderStateMixin {
   Completer<GoogleMapController> _mapController = Completer();
 
   String _mapStyle;
@@ -32,10 +32,10 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
 
   AnimationController _ac;
   Animation<Offset> _animation;
-   double latt =31.476101;
- // static var latt =32.1009479;
-   double longg = 74.280672;
- // static var longg = 74.190527;
+  double latt = 31.476101;
+  // static var latt =32.1009479;
+  double longg = 74.280672;
+  // static var longg = 74.190527;
   Place _selectedPlace;
   Position position;
   final CameraPosition _initialCamera = CameraPosition(
@@ -43,34 +43,31 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
     zoom: 14.0000,
   );
 
-  GoogleMapController _controller ;
+  GoogleMapController _controller;
   Map<String, double> currentLocation;
 
   TextEditingController textController = TextEditingController();
- void getUserLocation() async {
-   
-     currentLocation = <String, double>{};
-   
+  void getUserLocation() async {
+    currentLocation = <String, double>{};
+
     try {
       final location = LocationManager.Location();
       currentLocation = await location.getLocation();
-      position = position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
-   
+      position = position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.bestForNavigation);
+
       final lat = currentLocation["latitude"];
       final lng = currentLocation["longitude"];
-     setState(() {
-       latt = lat;
-       longg = lng;
-     
-      
-     });
-       
+      setState(() {
+        latt = lat;
+        longg = lng;
+      });
+
       print('Your Latitude is: $latt, Longitude is: $longg');
-     // await _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:LatLng(lat, lng),zoom: 15,)));
-     
-      String address = await HelperMethods.findCordinateAddress(position,context);
+      // await _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target:LatLng(lat, lng),zoom: 15,)));
 
-
+      String address =
+          await HelperMethods.findCordinateAddress(position, context);
     } on Exception {
       currentLocation = null;
       return null;
@@ -100,15 +97,16 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
+    getUserLocation();
     return Scaffold(
-   //   resizeToAvoidBottomInset: false,
+      //   resizeToAvoidBottomInset: false,
       body: Stack(
         children: <Widget>[
           // Map widget
           GoogleMap(
             initialCameraPosition: _initialCamera,
             markers: _markers,
-          
+
             myLocationEnabled: true,
 
             // Adds Path from user to selected location
@@ -151,35 +149,37 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
           Positioned(
             top: 60,
             left: MediaQuery.of(context).size.width * 0.05,
-            child:  Container(
+            child: Container(
               padding: EdgeInsets.all(10),
-             decoration: BoxDecoration(
-      color:  Colors.white,
-      borderRadius: BorderRadius.all(Radius.circular(6.0)),
-      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 10)],
-    ),
-              width: MediaQuery.of(context).size.width * 0.9,
-            child: TextField(
-              enabled: false,
-              decoration: InputDecoration(
-               hintText: Provider.of<AppData>(context).pickupAddress.placeName,
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                hintStyle: TextStyle(
-                  color:  Colors.grey[850],
-                ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black12, blurRadius: 20, spreadRadius: 10)
+                ],
               ),
-              
-              autofocus: false,
-             
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.04,
-                color:Colors.grey[850],
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: TextField(
+                enabled: false,
+                decoration: InputDecoration(
+                  hintText:
+                      Provider.of<AppData>(context).pickupAddress.placeName,
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                  hintStyle: TextStyle(
+                    color: Colors.grey[850],
+                  ),
+                ),
+                autofocus: false,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                  color: Colors.grey[850],
+                ),
               ),
             ),
           ),
-         
-           ),
 
           // SearchMapPlace widget
           Positioned(
@@ -195,20 +195,19 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
               placeholder: 'Search Destination Location',
               radius: 30000,
               onSelected: (place) async {
-
-                
                 final geolocation = await place.geolocation;
 
-                   Address  thisPlace = Address();
-                    thisPlace.placeName = place.description;
-                    thisPlace.placeId= place.placeId;
-                    thisPlace.placeFormattedAddress = place.description;
-                    thisPlace.latitude = geolocation.coordinates.latitude;
-                    thisPlace.longitude = geolocation.coordinates.longitude;
-                    print(place.fullJSON);
- Provider.of<AppData>(context,listen: false).updateDestinationAddress(thisPlace);
-                       Navigator.pop(context, 'getDirection');
-  /*                  PointLatLng ori = PointLatLng(_initialCamera.target.latitude,
+                Address thisPlace = Address();
+                thisPlace.placeName = place.description;
+                thisPlace.placeId = place.placeId;
+                thisPlace.placeFormattedAddress = place.description;
+                thisPlace.latitude = geolocation.coordinates.latitude;
+                thisPlace.longitude = geolocation.coordinates.longitude;
+                print(place.fullJSON);
+                Provider.of<AppData>(context, listen: false)
+                    .updateDestinationAddress(thisPlace);
+                Navigator.pop(context, 'getDirection');
+                /*                  PointLatLng ori = PointLatLng(_initialCamera.target.latitude,
                   _initialCamera.target.longitude,);
 
                   PointLatLng  desti = PointLatLng(geolocation.coordinates.latitude,
@@ -253,86 +252,83 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
                 // Animates the "start route" box in to the screen
                 _ac.forward();
 */
-              
-
-                    
               },
             ),
           ),
 
           // Box that will be animated in to the screen when user selects place.
-            SlideTransition(
-      position: _animation,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        padding: const EdgeInsets.all(20),
-        height: 250,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black12,
-              spreadRadius: 15.0,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              (_selectedPlace != null)
-                  ? (_selectedPlace.description.length < 25
-                      ? "${_selectedPlace.description}"
-                      : "${_selectedPlace.description.replaceRange(25, _selectedPlace.description.length, "")} ...")
-                  : "",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 26.0,
+          SlideTransition(
+            position: _animation,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              padding: const EdgeInsets.all(20),
+              height: 250,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black12,
+                    spreadRadius: 15.0,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    (_selectedPlace != null)
+                        ? (_selectedPlace.description.length < 25
+                            ? "${_selectedPlace.description}"
+                            : "${_selectedPlace.description.replaceRange(25, _selectedPlace.description.length, "")} ...")
+                        : "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 26.0,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FlatButton(
+                        onPressed: () {
+                          Address thisPlace = Address();
+                          thisPlace.placeName = _selectedPlace.description;
+                          thisPlace.placeId = _selectedPlace.placeId;
+                          thisPlace.placeFormattedAddress =
+                              _selectedPlace.description;
+                          print(_selectedPlace.fullJSON);
+                          // thisPlace.latitude = _selectedPlace.;
+                          //  Provider.of<AppData>(context,listen: false).updatePickupAddress(thisPlace);
+                          //  Navigator.pop(context, 'getDirection');
+
+                          Provider.of<AppData>(context, listen: false)
+                              .updateDestinationAddress(thisPlace);
+                          Navigator.pop(context, 'getDirection');
+                        },
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Text(
+                          "Done",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        color: Colors.teal[200].withOpacity(0.8),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 5),
-           
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Address  thisPlace = Address();
-                    thisPlace.placeName = _selectedPlace.description;
-                    thisPlace.placeId= _selectedPlace.placeId;
-                    thisPlace.placeFormattedAddress = _selectedPlace.description;
-                    print(_selectedPlace.fullJSON);
-                   // thisPlace.latitude = _selectedPlace.;
-                  //  Provider.of<AppData>(context,listen: false).updatePickupAddress(thisPlace);
-                 //  Navigator.pop(context, 'getDirection');
-
-                  Provider.of<AppData>(context,listen: false).updateDestinationAddress(thisPlace);
-                       Navigator.pop(context, 'getDirection');
-                  },
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: Text(
-                    "Done",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  color: Colors.teal[200].withOpacity(0.8),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    )
- 
+          )
         ],
       ),
     );
   }
 
   Widget confirmationBox() {
-    return 
-    SlideTransition(
+    return SlideTransition(
       position: _animation,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -364,25 +360,27 @@ class MapSampleState extends State<MapPage> with SingleTickerProviderStateMixin 
               ),
             ),
             SizedBox(height: 5),
-           
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 FlatButton(
                   onPressed: () {
-                    Address  thisPlace = Address();
+                    Address thisPlace = Address();
                     thisPlace.placeName = _selectedPlace.description;
-                    thisPlace.placeId= _selectedPlace.placeId;
-                    thisPlace.placeFormattedAddress = _selectedPlace.description;
+                    thisPlace.placeId = _selectedPlace.placeId;
+                    thisPlace.placeFormattedAddress =
+                        _selectedPlace.description;
                     print(_selectedPlace.fullJSON);
-                   // thisPlace.latitude = _selectedPlace.;
-                  //  Provider.of<AppData>(context,listen: false).updatePickupAddress(thisPlace);
-                 //  Navigator.pop(context, 'getDirection');
+                    // thisPlace.latitude = _selectedPlace.;
+                    //  Provider.of<AppData>(context,listen: false).updatePickupAddress(thisPlace);
+                    //  Navigator.pop(context, 'getDirection');
 
-                  Provider.of<AppData>(context,listen: false).updateDestinationAddress(thisPlace);
-                       Navigator.pop(context, 'getDirection');
+                    Provider.of<AppData>(context, listen: false)
+                        .updateDestinationAddress(thisPlace);
+                    Navigator.pop(context, 'getDirection');
                   },
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Text(
                     "Done",
                     style: TextStyle(fontSize: 16),

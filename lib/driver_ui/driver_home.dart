@@ -837,6 +837,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
   }
 
   void getUserLocation() async {
+    
     final GoogleMapController mapController = await _controller;
     setState(() {
       isLoading = false;
@@ -886,7 +887,7 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
       currentLocation = event;
       DatabaseReference teRef = FirebaseDatabase.instance
           .reference()
-          .child('users/${currentUserInfo.id}}');
+          .child('users/${currentUserInfo.id}');
 
       Map currentPosition = {
         'lat': currentLocation["latitude"],
@@ -902,6 +903,8 @@ class _DriverHomeClassState extends State<DriverHomeClass> {
     rideReference =
         FirebaseDatabase.instance.reference().child('users/${user.uid}/newReq');
     await checkRequest();
+
+    
   }
 
   Future<void> geoOnline(status) async {
