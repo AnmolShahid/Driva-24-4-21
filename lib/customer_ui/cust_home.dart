@@ -1705,31 +1705,31 @@ class _CustomerHomeClassState extends State<CustomerHomeClass> {
       });
     currentLocation = <String, double>{};
 
+    final location = LocationManager.Location();
+    currentLocation = await location.getLocation();
+    position = position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
+
+    final lat = currentLocation["latitude"];
+    final lng = currentLocation["longitude"];
+    setState(() {
+      latt = lat;
+      longg = lng;
+      gotLocation = true;
+    });
+
+    DatabaseReference teRef = FirebaseDatabase.instance
+        .reference()
+        .child('users/${currentUserInfo.id}');
+
+    Map currentPosition = {'lat': lat, 'lng': lng};
+    teRef.child('position').set(currentPosition);
+
+    PushNotificationService p = PushNotificationService();
+    var token = await p.getToken();
+
+    print('Your Latitude is: $latt, Longitude is: $longg');
     try {
-      final location = LocationManager.Location();
-      currentLocation = await location.getLocation();
-      position = position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.bestForNavigation);
-
-      final lat = currentLocation["latitude"];
-      final lng = currentLocation["longitude"];
-      setState(() {
-        latt = lat;
-        longg = lng;
-        gotLocation = true;
-      });
-
-      DatabaseReference teRef = FirebaseDatabase.instance
-          .reference()
-          .child('users/${currentUserInfo.id}');
-
-      Map currentPosition = {'lat': lat, 'lng': lng};
-      teRef.child('position').set(currentPosition);
-
-      PushNotificationService p = PushNotificationService();
-      var token = await p.getToken();
-
-      print('Your Latitude is: $latt, Longitude is: $longg');
       await _controller
           .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(latt, longg),

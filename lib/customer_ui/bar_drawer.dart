@@ -82,7 +82,7 @@ class CusDrawerPage extends PreferredSize {
                       ),
                     ),
                   ),
-                  currentUserInfo.id != null
+                  currentUserInfo != null
                       ? Container(
                           padding: EdgeInsets.only(bottom: 20),
                           color: primaryColor,
